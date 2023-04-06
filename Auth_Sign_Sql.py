@@ -5,6 +5,7 @@ import uuid
 from random import randint
 from eiacs_data_base import DB_BIZ
 import openpyxl
+import  id_num
 
 #自己写的
 def Insert_sign_user(filename):
@@ -33,7 +34,7 @@ def Insert_sign_user(filename):
 
     mysql_BIZ.commit()
 
-#gpt帮我优化的
+#gpt帮我优化的：将鉴权用户数据插入到已签约用户表中
 def Insert_sign_user_new(filename):
     mysql_BIZ = DB_BIZ()
     mysql_BIZ.init()
@@ -98,6 +99,19 @@ def Delete_sign_user_new(filename):
     mysql_BIZ.delete_data("DELETE FROM user_signed_info WHERE msisdn IN ({})".format(msisdns))
 
     mysql_BIZ.commit()
+def Delete_common_user_new(filename):
+    mysql_BIZ = DB_BIZ()
+    mysql_BIZ.init()
+
+    workbook = openpyxl.load_workbook(filename)
+    sheet = workbook['企业用户数据']
+    # 获取所有用户数据的msisdn值，并拼接成一个逗号分隔的字符串
+    msisdns = ",".join([str(row[1].value) for row in sheet.iter_rows(min_row=2)])
+
+    # 执行单个SQL语句，批量删除所有用户数据
+    mysql_BIZ.delete_data("DELETE FROM biz_commons_user WHERE msisdn IN ({})".format(msisdns))
+
+    mysql_BIZ.commit()
 if __name__ == '__main__':
     time_start = time.time()
     print("start time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
@@ -105,6 +119,8 @@ if __name__ == '__main__':
     # Insert_sign_user('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-10000-20230331115920.xlsx')
     # Delete_sign_user('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-10000-20230331115920.xlsx')
     # Delete_sign_user_new('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-10000-20230331115920.xlsx')
+    Delete_common_user_new('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-50000-20230403153329.xlsx')
+
     time_end = time.time()
     print("finish time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
     print("cost time: ", time_end - time_start)

@@ -222,7 +222,7 @@ def show_info():  # 显示函数
 def Create_Sign_Data(n):
     wb = openpyxl.Workbook()
     sheet1 = wb.active
-    sheet1.title = "鉴权终端用户数据"
+    sheet1.title = "企业用户数据"
 
     # 表头
     titles = ('姓名', '手机号(必填)', '身份证(必填)', '用户分组')
@@ -280,13 +280,70 @@ def Create_Sign_Data(n):
             str_id = list()
 
     return wb
+
+def Create_Sign_Data_sheet2(n):
+    wb = openpyxl.Workbook()
+    sheet1 = wb.active
+    sheet1.title = "参数说明"
+    sheet2 = wb.create_sheet("Sheet2")
+    sheet2.title = "企业用户数据"
+
+    # 表头
+    titles = ('姓名', '手机号(必填)', '身份证(必填)', '用户分组')
+    for index in range(len(titles)):
+        # write的第一个参数：行，第二个参数：列 第三个参数：内容 第四个参数：样式
+        sheet2.cell(row=1, column=index + 1).value = titles[index]
+    x = ""
+    y = ""
+    z = ""
+    # #写文件
+    for r in range(1, n+1):
+        for c in range(1, 5):
+            if c == 1:
+                sheet2.cell(r + 1, c).value = x.join(randname())
+            if c == 2:
+                sheet2.cell(r + 1, c).value = z.join(randomnum())
+            if c == 3:
+                sheet2.cell(r + 1, c).value = y.join(randid())
+            if c == 4:
+                sheet2.cell(r + 1, c).value = '普通用户组-TEST'
+            x = ""
+            y = ""
+            y = ""
+            global str_phone
+            global str_id
+            str_phone = list()
+            str_id = list()
+
+    return wb
+
+def create_sign_data_sheet2_gpt(n):
+    wb = openpyxl.Workbook()
+    sheet1 = wb.active
+    sheet1.title = "参数说明"
+    sheet2 = wb.create_sheet("企业用户数据")
+
+    # 表头
+    titles = ('姓名', '手机号(必填)', '身份证(必填)', '用户分组')
+    for index, title in enumerate(titles):
+        sheet2.cell(row=1, column=index + 1, value=title)
+    # 生成数据
+    for r in range(2, n + 2):
+        name = randname()
+        phone = randomnum()
+        id_num = randid()
+        sheet2.cell(r, 1, value=name)
+        sheet2.cell(r, 2, value=phone)
+        sheet2.cell(r, 3, value=id_num)
+        sheet2.cell(r, 4, value='普通用户组-TEST')
+    # 保存文件
+    return wb
 if __name__ == '__main__':
-    n=5000
+    n=1000
     now = datetime.datetime.now()
     formatted_time = now.strftime('%Y%m%d%H%M%S')
-    wb=Create_Sign_Data(n)
+    wb=Create_Sign_Data_sheet2(n)
     wb.save(r'/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-'+str(n)+'-'+str(formatted_time)+'.xlsx')
-    df = pd.read_excel('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' +str(n)+'-'+ str(formatted_time) + '.xlsx')
-
+    df = pd.read_excel('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' +str(n)+'-'+ str(formatted_time) + '.xlsx', sheet_name='企业用户数据')
     # 将数据保存为csv文件
     df.to_csv('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' +str(n)+'-'+ str(formatted_time)+'.csv', index=False)
