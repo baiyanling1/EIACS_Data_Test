@@ -333,9 +333,9 @@ def get_auth_user_gpt(num):
         sheet2.column_dimensions[col].width = 15
     # 保存为Excel和CSV文件
     file_name = f'auth-user-{num}-{formatted_time}'
-    wb.save(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.xlsx')
-    df = pd.read_excel(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.xlsx', sheet_name='鉴权终端用户数据')
-    df.to_csv(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.csv', index=False)
+    wb.save(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/user/{file_name}.xlsx')
+    df = pd.read_excel(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/user/{file_name}.xlsx', sheet_name='鉴权终端用户数据')
+    df.to_csv(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/user/{file_name}.csv', index=False)
 def get_auth_cpe_user(num):
     wb = openpyxl.Workbook()
     sheet1 = wb.active
@@ -415,7 +415,7 @@ def get_auth_cpe_user_gpt(num):
     sheet2 = wb.create_sheet("鉴权CPE设备数据")
 
     # 表头
-    titles = ('姓名', '手机号*', '身份证', '分组', '认证方式（0免密认证，1密码认证）*', '认证用户名*', '认证密码', 'IP地址',
+    titles = ('设备ID', '设备名称', '电话号码*', '分组', '认证方式（0免密认证，1密码认证）*', '认证用户名*', '认证密码', 'IP地址',
               'IP地址池名称', 'MAC地址', '下挂IP地址段*', '备注')
     for index, title in enumerate(titles):
         sheet2.cell(row=1, column=index + 1, value=title)
@@ -424,12 +424,12 @@ def get_auth_cpe_user_gpt(num):
         name = randname()
         phone = randomnum()
         id_num = randid()
-        sheet2.cell(r, 1, value=name)
-        sheet2.cell(r, 2, value="".join(phone))
-        sheet2.cell(r, 3, value="".join(id_num))
+        sheet2.cell(r, 1, value=str(r))
+        sheet2.cell(r, 2, value='CPE'+str(num))
+        sheet2.cell(r, 3, value="".join(phone))
         sheet2.cell(r, 4, value='CPE用户组-TEST')
         sheet2.cell(r, 5, value='1')
-        sheet2.cell(r, 6, value='test' + str(r))
+        sheet2.cell(r, 6, value='CPE_test' + str(r))
         sheet2.cell(r, 7, value='Redtea@123')
         sheet2.cell(r, 8, value='')
         sheet2.cell(r, 9, value='')
@@ -446,52 +446,10 @@ def get_auth_cpe_user_gpt(num):
     sheet2.column_dimensions['L'].width = 20
     # 保存为Excel和CSV文件
     file_name = f'auth-CPE-{num}-{formatted_time}'
-    wb.save(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.xlsx')
-    df = pd.read_excel(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.xlsx', sheet_name='鉴权CPE设备数据')
-    df.to_csv(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.csv', index=False)
-
-def get_auth_cpe_user_gpt_2(num):
-    wb = openpyxl.Workbook()
-    sheet1 = wb.active
-    sheet1.title = "参数说明"
-    sheet2 = wb.create_sheet("鉴权CPE设备数据")
-
-    # 表头
-    titles = ('姓名', '手机号*', '身份证', '分组', '认证方式（0免密认证，1密码认证）*', '认证用户名*', '认证密码', 'IP地址',
-              'IP地址池名称', 'MAC地址', '下挂IP地址段*', '备注')
-    for index, title in enumerate(titles):
-        sheet2.cell(row=1, column=index + 1, value=title)
-    # 生成数据
-    for r in range(2, num + 2):
-        name = randname()
-        phone = randomnum()
-        id_num = generate_id_number()
-        sheet2.cell(r, 1, value=name)
-        sheet2.cell(r, 2, value="".join(phone))
-        sheet2.cell(r, 3, value= id_num)
-        sheet2.cell(r, 4, value='CPE用户组-TEST')
-        sheet2.cell(r, 5, value='1')
-        sheet2.cell(r, 6, value='test' + str(r))
-        sheet2.cell(r, 7, value='Redtea@123')
-        sheet2.cell(r, 8, value='')
-        sheet2.cell(r, 9, value='')
-        sheet2.cell(r, 10, value='A0-10-10-B0-3A-88')
-        sheet2.cell(r, 11, value=random.choice(IP_group))
-        sheet2.cell(r, 12, value='CPE用户组-TEST' + str(r) + '12')
-        global str_phone
-        global str_id
-        str_phone = list()
-        str_id = list()
-    # 设置列宽
-    for col in ['B', 'C', 'D', 'G', 'J', 'K', 'L']:
-        sheet2.column_dimensions[col].width = 15
-    sheet2.column_dimensions['L'].width = 20
-    # 保存为Excel和CSV文件
-    file_name = f'auth-CPE-{num}-{formatted_time}'
-    wb.save(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.xlsx')
-    df = pd.read_excel(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.xlsx', sheet_name='鉴权CPE设备数据')
-    df.to_csv(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/{file_name}.csv', index=False)
+    wb.save(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/cpe/{file_name}.xlsx')
+    df = pd.read_excel(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/cpe/{file_name}.xlsx', sheet_name='鉴权CPE设备数据')
+    df.to_csv(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/cpe/{file_name}.csv', index=False)
 
 if __name__ == '__main__':
-    # get_auth_cpe_user_gpt_2(12)
-    get_auth_user_gpt(1000)
+    get_auth_cpe_user_gpt(100000)
+    # get_auth_user_gpt(1000)
