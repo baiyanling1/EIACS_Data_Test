@@ -1,5 +1,6 @@
 import csv
 import random
+import string
 import time
 import uuid
 from random import randint
@@ -12,28 +13,46 @@ now = datetime.datetime.now()
 formatted_time = now.strftime('%Y%m%d%H%M%S')
 
 surname = ["老师","学生","校长","董事","家属"]
-IP_group = ["192.168.0.1/24","192.168.0.1/16","192.168.0.1/32","192.168.0.1/8"]
+IP_group = ["192.168.0.1/24","192.168.0.1/16","192.168.0.1/32","192.168.0.1/28"]
 
 create_at = time.strftime('%Y-%m-%d %H:%M:%S')
 update_at = time.strftime('%Y-%m-%d %H:%M:%S')
-
 str_phone = list()
 str_id = list()
 str_id_connt = list()
-str_phone_connt = list()
+# str_phone_connt = list()
+
+str_phone_connt = set()
 
 
-
+def generate_mac_address():
+    mac = [ 0x00, 0x16, 0x3e,
+            random.randint(0x00, 0x7f),
+            random.randint(0x00, 0xff),
+            random.randint(0x00, 0xff) ]
+    return ':'.join(map(lambda x: "%02x" % x, mac))
 def randomnum():  # 手机号
-    str_phone.append(str(15))
-    for i in range(0, 9):
-        num = randint(1, 9)
-        str_phone.append(str(num))
-    if str_phone not in str_phone_connt:
-        # print(str_phone)
-        return str_phone
-    else:
-        pass
+    global str_phone_connt
+    str_phone = [str(15)]
+    while tuple(str_phone) in str_phone_connt:
+        str_phone = [str(15)]
+        for i in range(0, 9):
+            num = randint(1, 9)
+            str_phone.append(str(num))
+    str_phone_connt.add(tuple(str_phone))
+    return str_phone
+
+
+# def randomnum():  # 手机号
+#     str_phone.append(str(15))
+#     for i in range(0, 9):
+#         num = randint(1, 9)
+#         str_phone.append(str(num))
+#     if str_phone not in str_phone_connt:
+#         # print(str_phone)
+#         return str_phone
+#     else:
+#         pass
 
 
 def deal_day(d):  # 日期处理
@@ -296,12 +315,16 @@ def get_auth_user(num):
 
     # 将数据保存为csv文件
     df.to_csv('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-'+str(num)+'-'+str(formatted_time)+'.csv', index=False)
-
+def generate_auth_name(length=8):
+    """生成随机的认证用户名"""
+    letters = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    return ''.join(random.choice(letters) for _ in range(length))
 def get_auth_user_gpt(num):
     wb = openpyxl.Workbook()
     sheet1 = wb.active
     sheet1.title = "参数说明"
     sheet2 = wb.create_sheet("鉴权终端用户数据")
+    phone = 13800000001
     # 表头
     titles = ('姓名', '手机号*', '身份证', '分组', '部门', '认证方式（0免密认证，1密码认证）*', '认证用户名*', '认证密码', 'IP地址',
               'IP地址池名称', 'MAC地址', '备注')
@@ -310,24 +333,30 @@ def get_auth_user_gpt(num):
     # 生成数据
     for r in range(2, num + 2):
         name = randname()
-        phone = randomnum()
+        # phone = randomnum()
+        mac=generate_mac_address()
         id_num = randid()
+        auth_name=generate_auth_name()
         sheet2.cell(r, 1, value=name)
-        sheet2.cell(r, 2, value="".join(phone))
+        # sheet2.cell(r, 2, value="".join(phone))
+        sheet2.cell(r, 2, value=str(phone))
         sheet2.cell(r, 3, value="".join(id_num))
-        sheet2.cell(r, 4, value='普通用户组-TEST')
+        # sheet2.cell(r, 4, value='普通用户组-TEST')
+        sheet2.cell(r, 4, value=random.choice(surname))
         sheet2.cell(r, 5, value='普通用户组-TEST')
         sheet2.cell(r, 6, value='1')
-        sheet2.cell(r, 7, value='test' + str(r))
+        # sheet2.cell(r, 7, value='test' + str(r))
+        sheet2.cell(r, 7, value=auth_name)
         sheet2.cell(r, 8, value='Redtea@123')
         sheet2.cell(r, 9, value='')
         sheet2.cell(r, 10, value='')
-        sheet2.cell(r, 11, value='A0-10-10-B0-3A-88')
+        sheet2.cell(r, 11, value=mac)
         sheet2.cell(r, 12, value='普通用户组-TEST' + str(r) + '12')
         global str_phone
         global str_id
         str_phone = list()
         str_id = list()
+        phone += 1
     # 设置列宽
     for col in ['B', 'C', 'D', 'E', 'H', 'K', 'L']:
         sheet2.column_dimensions[col].width = 15
@@ -413,7 +442,7 @@ def get_auth_cpe_user_gpt(num):
     sheet1 = wb.active
     sheet1.title = "参数说明"
     sheet2 = wb.create_sheet("鉴权CPE设备数据")
-
+    cpe_phone=13900000001
     # 表头
     titles = ('设备ID', '设备名称', '电话号码*', '分组', '认证方式（0免密认证，1密码认证）*', '认证用户名*', '认证密码', 'IP地址',
               'IP地址池名称', 'MAC地址', '下挂IP地址段*', '备注')
@@ -422,24 +451,28 @@ def get_auth_cpe_user_gpt(num):
     # 生成数据
     for r in range(2, num + 2):
         name = randname()
-        phone = randomnum()
+        # phone = randomnum()
+        auth_name = generate_auth_name()
+        mac = generate_mac_address()
         id_num = randid()
         sheet2.cell(r, 1, value=str(r))
-        sheet2.cell(r, 2, value='CPE'+str(num))
-        sheet2.cell(r, 3, value="".join(phone))
-        sheet2.cell(r, 4, value='CPE用户组-TEST')
+        sheet2.cell(r, 2, value='CPE'+str(r))
+        # sheet2.cell(r, 3, value="".join(phone))
+        sheet2.cell(r, 3, value=str(cpe_phone))
+        sheet2.cell(r, 4, value='CPE'+random.choice(surname))
         sheet2.cell(r, 5, value='1')
-        sheet2.cell(r, 6, value='CPE_test' + str(r))
+        sheet2.cell(r, 6, value='CPE_test' + auth_name)
         sheet2.cell(r, 7, value='Redtea@123')
         sheet2.cell(r, 8, value='')
         sheet2.cell(r, 9, value='')
-        sheet2.cell(r, 10, value='A0-10-10-B0-3A-88')
+        sheet2.cell(r, 10, value=mac)
         sheet2.cell(r, 11, value=random.choice(IP_group))
         sheet2.cell(r, 12, value='CPE用户组-TEST' + str(r) + '12')
         global str_phone
         global str_id
         str_phone = list()
         str_id = list()
+        cpe_phone += 1
     # 设置列宽
     for col in ['B', 'C', 'D', 'G', 'J', 'K', 'L']:
         sheet2.column_dimensions[col].width = 15
@@ -451,5 +484,11 @@ def get_auth_cpe_user_gpt(num):
     df.to_csv(f'/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/cpe/{file_name}.csv', index=False)
 
 if __name__ == '__main__':
-    get_auth_cpe_user_gpt(100000)
-    # get_auth_user_gpt(1000)
+    time_start = time.time()
+    print("start time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
+    get_auth_cpe_user_gpt(200000)
+    # get_auth_user_gpt(200000)
+
+    time_end = time.time()
+    print("finish time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
+    print("cost time: ", time_end - time_start)

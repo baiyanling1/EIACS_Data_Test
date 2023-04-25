@@ -20,6 +20,13 @@ class DB_BIZ(object):
             charset='utf8',  # 编码
             database=DB_NAME_BIZ  # 选择数据库
         )
+    def Execute(self, sql,values):
+        db = self.mysql.cursor()
+
+        try:
+            db.execute(sql, values)
+        except Exception as e:
+            print('操作失败', e)
     def insert(self, biz_code, created_time, id_card, legal_user, msisdn,name,state,update_time):
         db = self.mysql.cursor()
         append = 'INSERT INTO signing_business_record (biz_code, created_time, id_card, legal_user, msisdn, name, state, update_time)  VALUES' + "(" + str(

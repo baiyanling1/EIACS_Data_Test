@@ -6,6 +6,7 @@ from random import randint
 import datetime
 import pandas as pd
 import openpyxl
+import re
 
 surname = ["老师","学生","校长","董事","家属"]
 
@@ -16,7 +17,6 @@ str_phone = list()
 str_id = list()
 str_id_connt = list()
 str_phone_connt = list()
-
 
 def randomnum():  # 手机号
     str_phone.append(str(15))
@@ -29,6 +29,41 @@ def randomnum():  # 手机号
     else:
         pass
 
+
+# def generate_phone_number():
+#     while True:
+#         suffix = "".join([str(random.randint(0, 9)) for _ in range(PHONE_NUMBER_SUFFIX_LENGTH)])
+#         phone_number = PHONE_NUMBER_PREFIX + str(random.randint(3, 9)) + suffix
+#         if PHONE_NUMBER_REGEX.match(phone_number):
+#             return phone_number
+# def generate_phone_number():
+#     while True:
+#         suffix = "".join(random.choices(range(10), k=PHONE_NUMBER_SUFFIX_LENGTH))
+#         phone_number = PHONE_NUMBER_PREFIX + str(random.randint(3, 9)) + suffix
+#         if PHONE_NUMBER_REGEX.match(phone_number):
+#             return phone_number
+# def generate_phone_number():
+#     phone_regex = re.compile(r"^1(3[0-9]|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])[0-9]{8}$")
+#     while True:
+#         phone_number = "1" + str(random.choice([3, 4, 5, 6, 7, 8, 9]))
+#         for i in range(8):
+#             phone_number += str(random.randint(0, 9))
+#         if phone_regex.match(phone_number):
+#             return phone_number
+# def generate_phone_number():
+#     # regex = r"^1(3\d|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8\d|9[0-35-9])\d{8}$"
+#     phone_regex = re.compile(r"^1(3\d|4[5-9]|5[0-3,5-9]|6[2-5,6-7]|7[0-8]|8\d|9[0-3,5-9])\d{8}$")
+#
+#     while True:
+#         phone_num = "1" + str(random.randint(3, 9)) + "".join([str(random.randint(0, 9)) for _ in range(8)])
+#         match = re.match(phone_regex, phone_num)
+#         if match:
+#             return phone_num
+
+def generate_phone_number():
+    prefix = ['130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '150', '151', '152', '156', '157', '158', '159', '170', '176', '177', '178', '180', '181', '182', '183', '184', '185', '186', '187', '188', '189']
+    phone_number = random.choice(prefix) + ''.join(random.sample('0123456789', 8))
+    return phone_number
 
 def deal_day(d):  # 日期处理
     id_day = randint(1, d)
@@ -302,7 +337,8 @@ def Create_Sign_Data_sheet2(n):
             if c == 1:
                 sheet2.cell(r + 1, c).value = x.join(randname())
             if c == 2:
-                sheet2.cell(r + 1, c).value = z.join(randomnum())
+                # sheet2.cell(r + 1, c).value = z.join(randomnum())
+                sheet2.cell(r + 1, c).value = phone = generate_phone_number()
             if c == 3:
                 sheet2.cell(r + 1, c).value = y.join(randid())
             if c == 4:
@@ -338,12 +374,46 @@ def create_sign_data_sheet2_gpt(n):
         sheet2.cell(r, 4, value='普通用户组-TEST')
     # 保存文件
     return wb
-if __name__ == '__main__':
-    n=1000
+def create_sign_data_sheet2_gpt_phoneok(n):
+    wb = openpyxl.Workbook()
+    sheet1 = wb.active
+    sheet1.title = "参数说明"
+    sheet2 = wb.create_sheet("企业用户数据")
+
+    # 表头
+    titles = ('姓名', '手机号(必填)', '身份证(必填)', '用户分组')
+    for index, title in enumerate(titles):
+        sheet2.cell(row=1, column=index + 1, value=title)
+    # 生成数据
+    for r in range(2, n + 2):
+        name = randname()
+        phone = generate_phone_number()
+        id_num = randid()
+        sheet2.cell(r, 1, value=name)
+        sheet2.cell(r, 2, value=phone)
+        sheet2.cell(r, 3, value=id_num)
+        sheet2.cell(r, 4, value='普通用户组-TEST')
+    # 保存文件
+    return wb
+
+def creat_sign_data(num):
+    n = num
     now = datetime.datetime.now()
     formatted_time = now.strftime('%Y%m%d%H%M%S')
-    wb=Create_Sign_Data_sheet2(n)
-    wb.save(r'/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-'+str(n)+'-'+str(formatted_time)+'.xlsx')
-    df = pd.read_excel('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' +str(n)+'-'+ str(formatted_time) + '.xlsx', sheet_name='企业用户数据')
+    time_start = time.time()
+    print("start time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
+    wb = Create_Sign_Data_sheet2(n)
+    wb.save(r'/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' + str(n) + '-' + str(
+        formatted_time) + '.xlsx')
+    df = pd.read_excel('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' + str(n) + '-' + str(
+        formatted_time) + '.xlsx', sheet_name='企业用户数据')
     # 将数据保存为csv文件
-    df.to_csv('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' +str(n)+'-'+ str(formatted_time)+'.csv', index=False)
+    df.to_csv('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' + str(n) + '-' + str(
+        formatted_time) + '.csv', index=False)
+    time_end = time.time()
+    print("finish time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
+    print("cost time: ", time_end - time_start)
+
+if __name__ == '__main__':
+    # print(generate_phone_number())
+    creat_sign_data(10)

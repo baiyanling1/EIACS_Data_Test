@@ -198,7 +198,7 @@ if __name__ == '__main__':
     #通过redis获取token
     #Get_PK 获取公钥alias
     #modifyPassWithoutOld(alias,token)重置密码成功
-    ADD_Central_User_modifyPassWithoutOld(100)
+    ADD_Central_User_modifyPassWithoutOld(30)
     # Resetpassword("57")
     # ADD_Central_User(1)
     # public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi9QuRSQ4KPfkwtByuVEaF024JtnLEcIGo5vMVrJkP3G6zL0fuxkGkuK9QneAXSB+am87PWLjAM+XpsEiRQ0KIgcchOAcP3JoqWMi/n3vn+jrkLU/RrQ9ErEEGnenA/6kf9E8H2v9W/fSAEMqX5ohhphR3inOtWnSacItBD0xk+8SayMIcNNGFRxbJc19ZEYAZMdOY/nVfHEm9Bu57DUctmbk7nORM7yDO5PndVg5dSHgjy4Ns4pXopKcF/O9vwEesk4DVLwf02Dmt1QqNTymj6JupSAUuCo5IS6o47PaeGIpfo35AHC0EnZ+xLqQfr6KQzGF0xrPF5Xqctah9kFNPwIDAQAB"
