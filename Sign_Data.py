@@ -6,7 +6,9 @@ from random import randint
 import datetime
 import pandas as pd
 import openpyxl
+from openpyxl.worksheet.datavalidation import DataValidation
 import re
+from eiacs_data_base import DB_BIZ
 
 surname = ["老师","学生","校长","董事","家属"]
 
@@ -316,40 +318,42 @@ def Create_Sign_Data(n):
 
     return wb
 
-def Create_Sign_Data_sheet2(n):
+def Create_Sign_Data_sheet2(n,issign=''):
     wb = openpyxl.Workbook()
     sheet1 = wb.active
     sheet1.title = "参数说明"
     sheet2 = wb.create_sheet("Sheet2")
     sheet2.title = "企业用户数据"
-
+    dv = DataValidation(type="list", formula1='"是,否"')
+    sheet2.add_data_validation(dv)
     # 表头
-    titles = ('姓名', '手机号(必填)', '身份证(必填)', '用户分组')
+    titles = ('姓名', '手机号(必填)', '身份证(必填)', '用户分组', '已签约')
     for index in range(len(titles)):
         # write的第一个参数：行，第二个参数：列 第三个参数：内容 第四个参数：样式
         sheet2.cell(row=1, column=index + 1).value = titles[index]
     x = ""
     y = ""
     z = ""
-    # #写文件
-    for r in range(1, n+1):
-        for c in range(1, 5):
-            if c == 1:
-                sheet2.cell(r + 1, c).value = x.join(randname())
-            if c == 2:
-                # sheet2.cell(r + 1, c).value = z.join(randomnum())
-                sheet2.cell(r + 1, c).value = phone = generate_phone_number()
-            if c == 3:
-                sheet2.cell(r + 1, c).value = y.join(randid())
-            if c == 4:
-                sheet2.cell(r + 1, c).value = '普通用户组-TEST'
-            x = ""
-            y = ""
-            y = ""
-            global str_phone
-            global str_id
-            str_phone = list()
-            str_id = list()
+    for r in range(2, n + 2):
+        # print("进入循环@")
+        name = x.join(randname())
+        phone =generate_phone_number()
+        # phone = z.join(randomnum())
+        id_num = y.join(randid())
+        sheet2.cell(r, 1, value=name)
+        sheet2.cell(r, 2, value=phone)
+        sheet2.cell(r, 3, value=id_num)
+        sheet2.cell(r, 4, value='普通用户组-TEST')
+        # sheet2.cell(r, 5, value='是')
+        dv.add(sheet2.cell(r, 5))
+        sheet2.cell(r, 5).value = issign
+        x = ""
+        y = ""
+        y = ""
+        global str_phone
+        global str_id
+        str_phone = list()
+        str_id = list()
 
     return wb
 
@@ -381,11 +385,12 @@ def create_sign_data_sheet2_gpt_phoneok(n):
     sheet2 = wb.create_sheet("企业用户数据")
 
     # 表头
-    titles = ('姓名', '手机号(必填)', '身份证(必填)', '用户分组')
+    titles = ('姓名', '手机号(必填)', '身份证(必填)', '用户分组', '已签约')
     for index, title in enumerate(titles):
         sheet2.cell(row=1, column=index + 1, value=title)
     # 生成数据
     for r in range(2, n + 2):
+        print("进入循环@")
         name = randname()
         phone = generate_phone_number()
         id_num = randid()
@@ -393,27 +398,68 @@ def create_sign_data_sheet2_gpt_phoneok(n):
         sheet2.cell(r, 2, value=phone)
         sheet2.cell(r, 3, value=id_num)
         sheet2.cell(r, 4, value='普通用户组-TEST')
+        sheet2.cell(r, 5, value='是')
     # 保存文件
     return wb
 
-def creat_sign_data(num):
+def creat_sign_data(num,issign=''):
     n = num
     now = datetime.datetime.now()
     formatted_time = now.strftime('%Y%m%d%H%M%S')
     time_start = time.time()
     print("start time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
-    wb = Create_Sign_Data_sheet2(n)
+    wb = Create_Sign_Data_sheet2(n,issign)
+    print("结束")
     wb.save(r'/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' + str(n) + '-' + str(
         formatted_time) + '.xlsx')
-    df = pd.read_excel('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' + str(n) + '-' + str(
-        formatted_time) + '.xlsx', sheet_name='企业用户数据')
-    # 将数据保存为csv文件
-    df.to_csv('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' + str(n) + '-' + str(
-        formatted_time) + '.csv', index=False)
+    # df = pd.read_excel('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' + str(n) + '-' + str(
+    #     formatted_time) + '.xlsx', sheet_name='企业用户数据')
+    # # 将数据保存为csv文件
+    # df.to_csv('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-' + str(n) + '-' + str(
+    #     formatted_time) + '.csv', index=False)
     time_end = time.time()
     print("finish time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
     print("cost time: ", time_end - time_start)
+def Insert_sign_user(num):
+    mysql_BIZ = DB_BIZ()
+    mysql_BIZ.init()
+    created_time = time.strftime('%Y-%m-%d %H:%M:%S')
+    update_time = time.strftime('%Y-%m-%d %H:%M:%S')
+    userValues_BIZ = []
+    sql_BIZ_1 = "INSERT INTO user_signed_info(created_time, group_name, id_card, legal_user, msisdn,name,update_time) VALUE (%s,%s,%s,%s,%s,%s,%s)"
+    x = ""
+    y = ""
+    z = ""
+    # workbook = openpyxl.load_workbook(filename)
+    # sheet = workbook['鉴权终端用户数据']
+    # data = (psycopg2.Binary(b'1'),)
+    # 遍历行
+    for row in range(0,num):
+        # 获取单元格数据
+        name = x.join(randname())
+        msisdn = generate_phone_number()
+        id_card = y.join(randid())
+        group_name = '普通用户组-TEST'
+        userValues_BIZ.append(
+            (str(created_time), str(group_name), str(id_card), 1, str(msisdn), str(name), str(update_time)))
+        x = ""
+        y = ""
+        y = ""
+        global str_phone
+        global str_id
+        str_phone = list()
+        str_id = list()
+        if len(userValues_BIZ) == 1000:
+            print("进入循环: ",row)
+            mysql_BIZ.insert_new_data(sql_BIZ_1, userValues_BIZ)
+            userValues_BIZ = []
+
+    mysql_BIZ.commit()
 
 if __name__ == '__main__':
     # print(generate_phone_number())
-    creat_sign_data(10)
+    # creat_sign_data(100,'否')
+    #创建100000万条数据，  是否签约为是
+    # creat_sign_data(100000, '是')
+    Insert_sign_user(1000000)
+    # creat_sign_data(100)

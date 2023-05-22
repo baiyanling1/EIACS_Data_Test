@@ -145,7 +145,7 @@ def Insert_AuthData_to_mysql(filename):
     created_time = time.strftime('%Y-%m-%d %H:%M:%S')
     update_time = time.strftime('%Y-%m-%d %H:%M:%S')
     userValues_BIZ = []
-    sql_BIZ_1 = 'INSERT INTO db_eiacs_biz.biz_commons_user (active_num, auth_name, auth_pass, auth_type, create_time, department, group_name, id_card, ip, is_online, legal_user, mac_addr, msisdn, nas_id_str, offline_time, online_time, real_name, remark, update_time, session_expire_time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+    sql_BIZ_1 = 'INSERT INTO db_eiacs_biz.biz_commons_user (active_num, auth_name, auth_pass, auth_type, create_time, department, group_name, id_card, ip, is_online, legal_user, mac_addr, msisdn, nas_id_str, offline_time, online_time, real_name, remark, update_time, session_expire_time, is_sign) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
 
     workbook = openpyxl.load_workbook(filename)
     sheet = workbook['鉴权终端用户数据']
@@ -162,7 +162,7 @@ def Insert_AuthData_to_mysql(filename):
         auth_name = row[6].value
         auth_pass = row[7].value
         mac_addr = row[10].value
-        userValues_BIZ.append((1, auth_name, auth_pass, auth_type, created_time, department, group_name, id_card, '', 0, 0, mac_addr, msisdn, '', created_time, created_time, real_name, '', update_time, update_time))
+        userValues_BIZ.append((1, auth_name, auth_pass, auth_type, created_time, department, group_name, id_card, '', 0, 0, mac_addr, msisdn, '', created_time, created_time, real_name, '', update_time, update_time, 0))
         # print(userValues_BIZ)
         # 如果userValues_BIZ列表长度达到1000，则批量插入到数据库中
         if len(userValues_BIZ) == 1000:
@@ -221,9 +221,9 @@ if __name__ == '__main__':
     time_end = time.time()
     print("finish time: ", time.strftime('%Y-%m-%d %H:%M:%S'))
     print("cost time: ", time_end - time_start)
-    Insert_AuthCPEData_to_mysql('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/cpe/auth-CPE-200000-20230420175120.xlsx')
+    # Insert_AuthCPEData_to_mysql('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/cpe/auth-CPE-200000-20230420175120.xlsx')
     # Insert_AuthData_to_mysql('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/user/auth-user-200000-20230420163033.xlsx')
-    # Insert_sign_user('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-10000-20230331115920.xlsx')
+    Insert_sign_user('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/user/auth-user-200000-20230420163033.xlsx')
     # Delete_sign_user('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-10000-20230331115920.xlsx')
     # Delete_sign_user_new('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-10000-20230331115920.xlsx')
     # Delete_common_user_new('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-50000-20230403153329.xlsx')
