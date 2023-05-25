@@ -3,7 +3,11 @@ from Crypto.Hash import MD2
 from Crypto.PublicKey import SM2
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Util.Padding import pad, unpad
-
+from Crypto.Hash import MD2
+from Crypto.PublicKey import SM2
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Hash import SM3
+from Crypto.Util.Padding import pad, unpad
 
 # import sys
 # sys.path.append('/usr/local/Cellar/openssl@3/3.1.0')
@@ -21,11 +25,7 @@ plaintext_with_digest = plaintext + '##' + sm3_digest.hex()
 
 # SM2加密公钥
 sm2_pubkey_str = 'd9c07b1e2856875b56'
-from Crypto.Hash import MD2
-from Crypto.PublicKey import SM2
-from Crypto.Cipher import PKCS1_OAEP
-from Crypto.Hash import SM3
-from Crypto.Util.Padding import pad, unpad
+
 
 
 # import sys

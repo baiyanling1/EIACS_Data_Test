@@ -10,6 +10,7 @@ import pandas as pd
 from eiacs_data_base import DB_BIZ
 import openpyxl
 import  id_num
+
 def encode_password(password):
     # 将字符串转换为二进制数据
     password_bytes = password.encode('utf-8')
@@ -223,7 +224,7 @@ if __name__ == '__main__':
     print("cost time: ", time_end - time_start)
     # Insert_AuthCPEData_to_mysql('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/cpe/auth-CPE-200000-20230420175120.xlsx')
     # Insert_AuthData_to_mysql('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/user/auth-user-200000-20230420163033.xlsx')
-    Insert_sign_user('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/user/auth-user-200000-20230420163033.xlsx')
+    Insert_sign_user_new('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/user/auth-user-200000-20230420163033.xlsx')
     # Delete_sign_user('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-10000-20230331115920.xlsx')
     # Delete_sign_user_new('/Users/hejian/Desktop/联通数科/性能测试数据/鉴权性能测试数据/auth-user-10000-20230331115920.xlsx')
     # Delete_common_user_new('/Users/hejian/Desktop/联通数科/性能测试数据/签约性能测试数据/sign-50000-20230403153329.xlsx')
